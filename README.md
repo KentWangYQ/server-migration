@@ -20,8 +20,10 @@
 #### 服务端
 1. 在config/__init__.py中设置服务器基本信息
 2. 在目标服务器上运行 python server.py启动服务端
+3. 文件默认提交到data/server目录下
 
 #### 客户端
 1. 在config/include.txt中设置需要迁移的文件目录
 2. 在config/exclude.txt中设置需要排除的文件目录
 3. 在源服务器上运行python client.py启动客户端，自动开始迁移
+4. 默认源目录为data/client

@@ -1,6 +1,6 @@
 import os
 import socket
-import pickle
+import json
 import time
 import threading
 import logging
@@ -50,7 +50,7 @@ class Client(object):
             return False, FileNotFoundError()
 
         # 发送目录和文件名
-        self.sock_client.send(pickle.dumps((file_dir, file_name)))
+        self.sock_client.send(json.dumps((file_dir, file_name)).encode())
         r = self.sock_client.recv(DEFAULT_BUFFER_SIZE)
 
         if r != Signal.FILE_INFO_RECEIVED:
@@ -63,9 +63,10 @@ class Client(object):
                 while True:
                     file_data = file.read(DEFAULT_BUFFER_SIZE)
                     if not file_data:
-                        time.sleep(.05)
                         # 发送成功
+                        time.sleep(.1)
                         self.sock_client.send(Signal.FILE_SEND_COMPLETE)
+                        time.sleep(.1)
                         break
                     self.sock_client.send(file_data)
             if self.sock_client.recv(DEFAULT_BUFFER_SIZE) != Signal.FILE_RECEIVED:
@@ -79,6 +80,7 @@ class Client(object):
         else:
             # 发送成功
             logger.info('File upload complete: %s' % path)
+
             return True, None
 
 

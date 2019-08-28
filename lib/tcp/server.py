@@ -1,7 +1,8 @@
 import os
 import socket
-import pickle
+import json
 import logging
+import time
 from socketserver import StreamRequestHandler
 from config import Service as ServiceConfig
 from lib.const import Signal, DEFAULT_BUFFER_SIZE, REQUEST_TIMEOUT
@@ -27,8 +28,9 @@ class FileHandler(StreamRequestHandler):
                     logger.info('Connection closed by client')
                     break
                 elif r:
+                    print(r)
                     # 接收文件基本信息
-                    file_dir, file_name = pickle.loads(r)
+                    file_dir, file_name = json.loads(r.decode())
                     self.request.send(Signal.FILE_INFO_RECEIVED)
 
                     file_dir += '' if file_dir.endswith('/') else '/'
@@ -42,6 +44,7 @@ class FileHandler(StreamRequestHandler):
                             while True:
                                 _data = self.request.recv(DEFAULT_BUFFER_SIZE)
                                 if _data == Signal.FILE_SEND_COMPLETE or not _data:
+                                    time.sleep(.1)
                                     # 接收完成
                                     break
                                 file.write(_data)

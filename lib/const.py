@@ -14,6 +14,6 @@ class Signal(object):
 
 DEFAULT_BUFFER_SIZE = 10240  # 默认buffer大小
 SERVER_PORT = 8080  # 服务器默认端口
-REQUEST_TIMEOUT = 10  # 请求超时时间
+REQUEST_TIMEOUT = 60  # 请求超时时间
 
-MAX_CLIENT_THREAD = 5  # 客户端进程数
+MAX_CLIENT_THREAD = 4  # 客户端进程数
