@@ -16,6 +16,8 @@ class FileDone(object):
     w_lock = Lock()
 
     def __init__(self):
+        if not os.path.exists(self.file_path):
+            os.makedirs(self.file_path)
         # 打开文件，因高频写入，保持常开，析构时关闭
         self.file_ab = open('%s%s' % (self.file_path, self.file_name), 'ab')
         self.total = 0

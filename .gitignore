@@ -105,5 +105,5 @@ venv.bak/
 
 
 .idea
-.data/server
-.data/persist
+data/server
+data/persist
