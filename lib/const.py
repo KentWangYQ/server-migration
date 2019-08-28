@@ -12,7 +12,7 @@ class Signal(object):
     FILE_SEND_COMPLETE = b'exit'  # 文件发送完成
 
 
-DEFAULT_BUFFER_SIZE = 1024  # 默认buffer大小
+DEFAULT_BUFFER_SIZE = 10240  # 默认buffer大小
 SERVER_PORT = 8080  # 服务器默认端口
 REQUEST_TIMEOUT = 10  # 请求超时时间
 

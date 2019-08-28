@@ -3,9 +3,12 @@ import socket
 import pickle
 import logging
 from socketserver import StreamRequestHandler
+from config import Service as ServiceConfig
 from lib.const import Signal, DEFAULT_BUFFER_SIZE, REQUEST_TIMEOUT
 
 logger = logging.getLogger('mig')
+
+root = ServiceConfig.ROOT + ('' if ServiceConfig.ROOT.endswith('/') else '/')
 
 
 class FileHandler(StreamRequestHandler):
@@ -31,7 +34,7 @@ class FileHandler(StreamRequestHandler):
                     file_dir += '' if file_dir.endswith('/') else '/'
 
                     try:
-                        path = 'data/server/%s' % file_dir
+                        path = '%s%s' % (root, file_dir)
                         if not os.path.exists(path):
                             os.makedirs(path)
                         # 接收并写入文件

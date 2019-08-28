@@ -6,6 +6,7 @@ import logging
 class Service(object):
     IP = '127.0.0.1'
     PORT = 8080
+    ROOT = 'data/server'
 
     MAX_RETRY = 3
 
