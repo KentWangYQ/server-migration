@@ -2,7 +2,6 @@ import os
 import socket
 import json
 import logging
-import time
 from socketserver import StreamRequestHandler
 from config import Service as ServiceConfig
 from lib.const import Signal, DEFAULT_BUFFER_SIZE, REQUEST_TIMEOUT
@@ -44,16 +43,16 @@ class FileHandler(StreamRequestHandler):
                             while True:
                                 _data = self.request.recv(DEFAULT_BUFFER_SIZE)
                                 if _data == Signal.FILE_SEND_COMPLETE or not _data:
-                                    time.sleep(.1)
                                     # 接收完成
                                     break
                                 file.write(_data)
+                                self.request.send(Signal.BUFFER_RECEIVED)
                     except IOError as e:
-                        self.request.send(Signal.FILE_RECEIVE_FAILED)
                         logger.error('File write failed: %s %s %s' % (file_dir, file_name, e))
-                    except Exception as e:
                         self.request.send(Signal.FILE_RECEIVE_FAILED)
+                    except Exception as e:
                         logger.error('Receive file failed: %s %s %s' % (file_dir, file_name, e))
+                        self.request.send(Signal.FILE_RECEIVE_FAILED)
                     else:
                         # 文件接收成功，向客户端发送成功信号
                         self.request.send(Signal.FILE_RECEIVED)

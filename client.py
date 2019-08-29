@@ -30,6 +30,7 @@ def send_file(info):
 
 
 if __name__ == '__main__':
+    logger.info('Client Started')
     clients = [Client((ServiceConfig.IP, ServiceConfig.PORT)) for _ in range(MAX_CLIENT_THREAD)]
     client_pool = ClientPool(clients=clients)
 

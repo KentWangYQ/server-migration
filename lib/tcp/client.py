@@ -51,6 +51,7 @@ class Client(object):
 
         # 发送目录和文件名
         self.sock_client.send(json.dumps((file_dir, file_name)).encode())
+        time.sleep(.1)
         r = self.sock_client.recv(DEFAULT_BUFFER_SIZE)
 
         if r != Signal.FILE_INFO_RECEIVED:
@@ -64,11 +65,13 @@ class Client(object):
                     file_data = file.read(DEFAULT_BUFFER_SIZE)
                     if not file_data:
                         # 发送成功
-                        time.sleep(.1)
+                        # time.sleep(.1)
                         self.sock_client.send(Signal.FILE_SEND_COMPLETE)
-                        time.sleep(.1)
                         break
                     self.sock_client.send(file_data)
+                    if self.sock_client.recv(DEFAULT_BUFFER_SIZE) != Signal.BUFFER_RECEIVED:
+                        return False, Exception('File info receive failed')
+
             if self.sock_client.recv(DEFAULT_BUFFER_SIZE) != Signal.FILE_RECEIVED:
                 # 服务端反馈文件接收失败
                 return False, Exception('File info receive failed')
