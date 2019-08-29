@@ -35,6 +35,7 @@ class Client(object):
         """
         # 先向服务器发送关闭信令
         self.sock_client.send(Signal.CLOSE)
+        self.sock_client.recv(DEFAULT_BUFFER_SIZE)
         self.sock_client.close()
 
     def send_file(self, file_dir, file_name):
@@ -61,16 +62,19 @@ class Client(object):
         # 发送文件
         try:
             with open(path, 'rb') as file:
+                ret, offset = 0, 0
                 while True:
-                    file_data = file.read(DEFAULT_BUFFER_SIZE)
-                    if not file_data:
+                    # 零拷贝发送
+                    ret = self.sock_client.sendfile(file, offset, DEFAULT_BUFFER_SIZE)
+                    if ret == 0:
                         # 发送成功
-                        # time.sleep(.1)
                         self.sock_client.send(Signal.FILE_SEND_COMPLETE)
                         break
-                    self.sock_client.send(file_data)
-                    if self.sock_client.recv(DEFAULT_BUFFER_SIZE) != Signal.BUFFER_RECEIVED:
-                        return False, Exception('File info receive failed')
+
+                    offset += ret
+                    r = self.sock_client.recv(DEFAULT_BUFFER_SIZE)
+                    if r != Signal.BUFFER_RECEIVED:
+                        return False, Exception('Buffer receive failed')
 
             if self.sock_client.recv(DEFAULT_BUFFER_SIZE) != Signal.FILE_RECEIVED:
                 # 服务端反馈文件接收失败

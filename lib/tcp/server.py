@@ -25,9 +25,9 @@ class FileHandler(StreamRequestHandler):
                 if r == Signal.CLOSE:
                     # 接收到客户端关闭信号，连接关闭
                     logger.info('Connection closed by client')
+                    self.request.send(Signal.CLOSE)
                     break
                 elif r:
-                    print(r)
                     # 接收文件基本信息
                     file_dir, file_name = json.loads(r.decode())
                     self.request.send(Signal.FILE_INFO_RECEIVED)
@@ -42,11 +42,14 @@ class FileHandler(StreamRequestHandler):
                         with open('%s%s' % (path, file_name), 'wb') as file:
                             while True:
                                 _data = self.request.recv(DEFAULT_BUFFER_SIZE)
-                                if _data == Signal.FILE_SEND_COMPLETE or not _data:
+                                if not _data or _data == Signal.FILE_SEND_COMPLETE:
                                     # 接收完成
                                     break
+
                                 file.write(_data)
                                 self.request.send(Signal.BUFFER_RECEIVED)
+                    except BrokenPipeError:
+                        logger.warning('Connection broken by client')
                     except IOError as e:
                         logger.error('File write failed: %s %s %s' % (file_dir, file_name, e))
                         self.request.send(Signal.FILE_RECEIVE_FAILED)
